@@ -28,9 +28,11 @@ http://203.66.57.98/
 1. Apache blocks attempts to read .htaccess.
 1. JRun apparently accepts '\' as a slash operator, so we can use a url like
    the following to read .htaccess and .htpasswd:
+
    http://203.66.57.98/.%5Cadmin%5C.htaccess%253b.jsp
+
    Apparently Apache hands this off to JRun because it ends with .jsp, and JRun
-   is fooled by the \. This lets you read the .htaccess and .htpasswd files.
+   is fooled by the \\. This lets you read the .htaccess and .htpasswd files.
 1. The .htpasswd file can be cracked with John.
 
 
