@@ -41,4 +41,18 @@ http://203.66.57.98/
 
 1. The .htpasswd file can be cracked with John.
 
+### Takeaways
 
+- If a funny/old web/application server is being used, check for
+  vulnerabilities.
+
+- 500 errors are often returned by Apache.
+
+- Check for double encoding errors. (For instance, ';' actually double encoded
+  as '%253b' instead of '%3b').
+
+- I guess there are some web/application servers that will accept a backslash
+  as a path name.  Check for this as well: %5C
+
+- Check for .htaccess files.  Getting a .htpasswd file basically means you can
+  crack it with John.
