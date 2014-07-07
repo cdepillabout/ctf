@@ -39,6 +39,14 @@ http://203.66.57.98/
    Apparently Apache hands this off to JRun because it ends with .jsp, and JRun
    is fooled by the '\'. This lets you read the .htaccess and .htpasswd files.
 
+1. Also, apparently forward slashes can be double encoded and they will be
+   passed to JRun as is:
+
+   http://203.66.57.98/admin%252f%252ehtpasswd%2500.jsp
+
+   In the above url, it also looks like they are appending %25%00.jsp to the
+   end of the file.  I think there is a separate exploit that works for this.
+
 1. The .htpasswd file can be cracked with John.
 
 ### Takeaways
@@ -49,10 +57,12 @@ http://203.66.57.98/
 - 500 errors are often returned by Apache.
 
 - Check for double encoding errors. (For instance, ';' actually double encoded
-  as '%253b' instead of '%3b').
+  as '%253b' instead of '%3b'. Also '/' being double encoded.)
 
 - I guess there are some web/application servers that will accept a backslash
   as a path name.  Check for this as well: %5C
+
+- Also embedding %00 in urls.  In this challenge it is actually double encoded.
 
 - Check for .htaccess files.  Getting a .htpasswd file basically means you can
   crack it with John.
