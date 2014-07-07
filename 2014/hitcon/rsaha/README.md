@@ -39,6 +39,7 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
    totient function.
 1. Choose an integer `e` such that `1 < e < φ(n)` and `gcd(e, φ(n)) = 1`.  That
    is to say, `e` and `φ(n)` are coprime.
+
      - `e` is the public key exponent.
      - `e` having a short bit-length and small Hamming weight results in more
        efficient encryption – most commonly `216 + 1 = 65,537`. However, much
