@@ -42,12 +42,13 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 
 1. Choose an integer `e` such that `1 < e < φ(n)` and `gcd(e, φ(n)) = 1`.  That
    is to say, `e` and `φ(n)` are coprime.
-
 	 - `e` is the public key exponent.
+
 	 - `e` having a short bit-length and small Hamming weight results in more
 	   efficient encryption – most commonly `216 + 1 = 65,537`. However, much
 	   smaller values of `e` (such as 3) have been shown to be less secure in
 	   some settings.
+
 1. Determine `d` as `d ≡ e−1 (mod φ(n))`; i.e., `d` is the multiplicative
    inverse of `e (modulo φ(n))`.
    - This is more clearly stated as: solve for `d` given `d⋅e ≡ 1 (mod φ(n))`
