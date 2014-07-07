@@ -34,9 +34,12 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 
 1. Choose two prime numbers, `p` and `q`.  They should be similar bit-length.
    Can be found efficiently using the primality test.
+
 1. Compute `n = pq`.  `n` is used as the modulus.
+
 1. Compute `φ(n) = φ(p)φ(q) = (p − 1)(q − 1) = n - (p + q - 1)`.  `φ` is Eulers
    totient function.
+
 1. Choose an integer `e` such that `1 < e < φ(n)` and `gcd(e, φ(n)) = 1`.  That
    is to say, `e` and `φ(n)` are coprime.
      - `e` is the public key exponent.
@@ -52,4 +55,5 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 	 pseudocode in the Modular integers section, inputs `a` and `n` correspond
 	 to `e` and `φ(n)`, respectively.
    - `d` is kept as the private key exponent.
+
 1. 
