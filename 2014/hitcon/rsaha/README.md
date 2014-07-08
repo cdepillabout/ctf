@@ -79,16 +79,18 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 Alice can recover `m` from `c` by using her private key exponent `d` by
 computing `m ≡ c^d (mod n)`.
 
-(There are more efficient ways of calculating `c^d` by using the Chinese
-remainder algorithm.)
+(There are more efficient ways of calculating `c^d` by using the [Chinese
+remainder algorithm](http://en.wikipedia.org/wiki/RSA_%28algorithm%29#Using_the_Chinese_remainder_algorithm).)
 
-#### Extended Euclidean Algorithm
+#### [Extended Euclidean Algorithm](http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm)
 
-#### Exponentiation by Squaring
+
+
+#### [Exponentiation by Squaring](http://en.wikipedia.org/wiki/Exponentiation_by_squaring)
 
 This allows us to efficiently calculate the encryption and decryption of a
 message like `c ≡ m^e (mod n)`.
 
+#### [Chinese Remainder Algorithm for Calculating `m` from `c`](http://en.wikipedia.org/wiki/RSA_%28algorithm%29#Using_the_Chinese_remainder_algorithm)
 
 
-#### Chinese Remainder Algorithm for Calculating `m` from `c`
