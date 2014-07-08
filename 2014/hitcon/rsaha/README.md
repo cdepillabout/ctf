@@ -54,9 +54,10 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 1. Determine `d` as `d ≡ e^(-1) (mod φ(n))`; i.e., `d` is the multiplicative
    inverse of `e (modulo φ(n))`.
    - This is more clearly stated as: solve for `d` given `d⋅e ≡ 1 (mod φ(n))`
-   - This is often computed using the extended Euclidean algorithm. Using the
-	 pseudocode in the Modular integers section, inputs `a` and `n` correspond
-	 to `e` and `φ(n)`, respectively.
+   - This is often computed using the [extended Euclidean
+	 algorithm](http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm).
+	 Using the pseudocode in the Modular integers section, inputs `a` and `n`
+	 correspond to `e` and `φ(n)`, respectively.
    - `d` is kept as the private key exponent.
 
 - *public key* consists of modulus `n` and public exponent `e`.
@@ -71,7 +72,7 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 1. Bob wants to send `m` to Alice (such that `0 ≤ m < n`).
 
 1. Bob computes `c` as `c ≡ m^e (mod n)`.  This can be done quickly using
-   exponentiation by quaring.
+   exponentiation by squaring.
 
 #### Decryption
 
@@ -84,5 +85,10 @@ remainder algorithm.)
 #### Extended Euclidean Algorithm
 
 #### Exponentiation by Squaring
+
+This allows us to efficiently calculate the encryption and decryption of a
+message like `c ≡ m^e (mod n)`.
+
+
 
 #### Chinese Remainder Algorithm for Calculating `m` from `c`
