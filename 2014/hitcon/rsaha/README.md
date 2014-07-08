@@ -48,7 +48,7 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
        smaller values of `e` (such as 3) have been shown to be less secure in
        some settings.
 
-1. Determine `d` as `d ≡ e−1 (mod φ(n))`; i.e., `d` is the multiplicative
+1. Determine `d` as `d ≡ e<sup>−1</sup> (mod φ(n))`; i.e., `d` is the multiplicative
    inverse of `e (modulo φ(n))`.
    - This is more clearly stated as: solve for `d` given `d⋅e ≡ 1 (mod φ(n))`
    - This is often computed using the extended Euclidean algorithm. Using the
@@ -58,7 +58,8 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 
 - *public key* consists of modulus `n` and public exponent `e`.
 
-- *private key* consists of modulus `n` and private exponent `d`. `p`, `q`, and `φ(n)` must also be kept secret because they can be used to calculate `d`.
+- *private key* consists of modulus `n` and private exponent `d`. `p`, `q`, and
+  `φ(n)` must also be kept secret because they can be used to calculate `d`.
 
 #### Encryption
 
