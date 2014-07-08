@@ -4,10 +4,8 @@
 all: build
 
 
-.cabal-sandbox:
-	cabal sandbox init
-
-.cabal-sandbox/bin/site: .cabal-sandbox
+.cabal-sandbox/bin/site: site.hs
+	if [ ! -d ".cabal-sandbox" ] ; then cabal sandbox init ; fi
 	cabal install
 
 _site:
