@@ -63,4 +63,23 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 
 #### Encryption
 
+1. Alice transfers her public key `(n, e)` to Bob and keeps the private key `d` secret.
+
+1. Bob wants to send `m` to Alice (such that `0 ≤ m < n`).
+
+1. Bob computes `c` as `c ≡ m^e (mod n)`.  This can be done quickly using
+   exponentiation by quaring.
+
 #### Decryption
+
+Alice can recover `m` from `c` by using her private key exponent `d` by
+computing `m ≡ c^d (mod n)`.
+
+(There are more efficient ways of calculating `c^d` by using the Chinese
+remainder algorithm.)
+
+#### Extended Euclidean Algorithm
+
+#### Exponentiation by Squaring
+
+#### Chinese Remainder Algorithm for Calculating `m` from `c`
