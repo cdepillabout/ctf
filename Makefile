@@ -26,7 +26,7 @@ deploy: _site/.git build
 	bash -c '(cd _site/ && git add -A . && git commit -m "Deploy" && git push)'
 
 watch: .cabal-sandbox/bin/site
-	.cabal-sandbox/bin/site watch
+	.cabal-sandbox/bin/site watch -h 0.0.0.0
 
 
 
