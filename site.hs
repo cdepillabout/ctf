@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
 import           Data.Monoid (mappend)
+import           Debug.Trace
 import           Hakyll
 
 
@@ -44,7 +45,8 @@ main = hakyll $ do
 
 
     match "index.html" $ do
-        route idRoute
+        -- route idRoute
+        route $ constRoute "_old/indexwhatwhat.html"
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
             let indexCtx =
@@ -58,6 +60,13 @@ main = hakyll $ do
                 >>= relativizeUrls
 
     match "templates/*" $ compile templateCompiler
+
+    match "_old/**" $ do
+        route idRoute
+        compile $ do
+            ident <- getUnderlying
+            traceShowM ident
+            copyFileCompiler
 
 
 --------------------------------------------------------------------------------
