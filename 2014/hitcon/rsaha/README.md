@@ -56,4 +56,10 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 	 to `e` and `φ(n)`, respectively.
    - `d` is kept as the private key exponent.
 
-1. 
+- *public key* consists of modulus `n` and public exponent `e`.
+
+- *private key* consists of modulus `n` and private exponent `d`. `p`, `q`, and `φ(n)` must also be kept secret because they can be used to calculate `d`.
+
+#### Encryption
+
+#### Decryption
