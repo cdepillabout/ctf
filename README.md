@@ -8,11 +8,12 @@ Building Site
 =============
 
 ```
-$ cabal install -j hakyll
+# build site
+$ make build
 
-$ ghc --make -threaded site.hs
+# run webserver and change on reload
+$ make watch
 
-$ ./site build
-
-$ ./site watch
+# deploy to github
+$ make deploy
 ```

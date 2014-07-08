@@ -1,9 +1,13 @@
 
-.PHONY: build cabal-clean clean watch
+.PHONY: build cabal-clean clean deploy super-clean watch
 
 all: build
 
-.cabal-sandbox/bin/site:
+
+.cabal-sandbox:
+	cabal sandbox init
+
+.cabal-sandbox/bin/site: .cabal-sandbox
 	cabal install
 
 _site:
@@ -11,16 +15,20 @@ _site:
 
 _site/.git: _site
 	cp -r .git _site/.git
-	bash -c '(cd _site/ && git checkout gh-pages && git reset --hard HEAD && git clean -f -x)'
+	bash -c '(cd _site/ && git checkout -f gh-pages && git reset --hard HEAD && git clean -f -x)'
 
-deploy: _site build
-	bash -c '(cd _site/ && git add -A . && git commit -m "Deploy" && git push)'
+
 
 build: .cabal-sandbox/bin/site _site
 	.cabal-sandbox/bin/site build
 
+deploy: _site/.git build
+	bash -c '(cd _site/ && git add -A . && git commit -m "Deploy" && git push)'
+
 watch: .cabal-sandbox/bin/site
 	.cabal-sandbox/bin/site watch
+
+
 
 clean: 
 	rm -rf ./_cache
@@ -29,3 +37,5 @@ clean:
 cabal-clean: 
 	rm -rf ./dist
 	rm -rf .cabal-sandbox/bin/site
+
+super-clean: clean cabal-clean
