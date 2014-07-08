@@ -13,3 +13,4 @@ cabal.config
 # hakyll generated files
 /_cache
 /_site
+/site
