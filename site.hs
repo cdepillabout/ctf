@@ -1,18 +1,57 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
-import           Data.Monoid (mappend)
-import           Debug.Trace
-import           Hakyll
-import           Data.List (stripPrefix)
-import           Data.Maybe (fromJust)
+import Control.Monad (filterM, forM, join, liftM, unless)
+import Data.Functor ((<$>))
+import Data.List (stripPrefix)
+import Data.Maybe (fromJust)
+import Data.Monoid (mappend)
+import Debug.Trace ()
+import Hakyll
+import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents)
+import System.FilePath ((</>))
 
 
 writeupsDir :: String
 writeupsDir = "writeups"
 
---------------------------------------------------------------------------------
+indexFileName :: String
+indexFileName = "index.md"
+
+unlessM :: Monad m => m Bool -> m () -> m ()
+--unlessM mbool monad = flip unless monad =<< mbool
+unlessM = join . liftM unless
+
+createIndexMdFiles :: IO ()
+createIndexMdFiles = getRecursiveDirs writeupsDir >>= mapM_ writeIndexMd
+  where
+    writeIndexMd :: FilePath -> IO ()
+    writeIndexMd dir = do
+        let fullPath = dir </> indexFileName
+        unlessM (doesFileExist fullPath) $ writeFile fullPath ""
+
+getRecursiveDirs :: FilePath -> IO [FilePath]
+getRecursiveDirs topDir = filterM doesDirectoryExist =<< getDirRecursiveContents topDir
+
+getDirRecursiveContents :: FilePath -> IO [FilePath]
+getDirRecursiveContents topdir = do
+    names <- getDirectoryContents topdir
+    let properNames = filter (`notElem` [".", ".."]) names
+    paths <- forM properNames $ \name -> do
+        let path = topdir </> name
+        isDirectory <- doesDirectoryExist path
+        if isDirectory
+            then (path :) <$> getDirRecursiveContents path
+            else return [path]
+    return (concat paths)
+
 main :: IO ()
-main = hakyll $ do
+main = do
+        createIndexMdFiles
+        doHakyll
+
+--------------------------------------------------------------------------------
+doHakyll :: IO ()
+doHakyll = hakyll $ do
 
     {-
     match "images/*" $ do
@@ -69,7 +108,7 @@ main = hakyll $ do
     -}
     match "templates/*" $ compile templateCompiler
 
-    match (fromGlob $ writeupsDir ++ "/**.md") $ do
+    match (fromGlob $ writeupsDir ++ "/**index.md") $ do
         route $ stripOffCtfPrefix `composeRoutes` setExtension "html"
         compile $ do
             --ident <- getUnderlying
@@ -86,7 +125,7 @@ main = hakyll $ do
 --------------------------------------------------------------------------------
 
 stripOffCtfPrefix :: Routes
-stripOffCtfPrefix = customRoute $ fromJust . stripPrefix "_old/" . toFilePath
+stripOffCtfPrefix = customRoute $ fromJust . stripPrefix (writeupsDir ++ "/") . toFilePath
 
 postCtx :: Context String
 postCtx =

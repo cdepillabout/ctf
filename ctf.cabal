@@ -59,6 +59,8 @@ executable site
   -- Other library packages from which modules are imported.
   build-depends:       base
                      , hakyll
+                     , directory
+                     , filepath
 
   
   -- Directories containing source files.
