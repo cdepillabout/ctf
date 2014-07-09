@@ -7,6 +7,9 @@ import           Data.List (stripPrefix)
 import           Data.Maybe (fromJust)
 
 
+writeupsDir :: String
+writeupsDir = "writeups"
+
 --------------------------------------------------------------------------------
 main :: IO ()
 main = hakyll $ do
@@ -66,17 +69,17 @@ main = hakyll $ do
     -}
     match "templates/*" $ compile templateCompiler
 
-    match "_old/**.md" $ do
+    match (fromGlob $ writeupsDir ++ "/**.md") $ do
         route $ stripOffCtfPrefix `composeRoutes` setExtension "html"
         compile $ do
-            ident <- getUnderlying
-            traceShowM ident
+            --ident <- getUnderlying
+            --traceShowM ident
             pandocCompiler
                 >>= loadAndApplyTemplate "templates/post.html"    postCtx
                 >>= loadAndApplyTemplate "templates/default.html" postCtx
                 >>= relativizeUrls
 
-    match "_old/**" $ do
+    match (fromGlob $ writeupsDir ++ "/**") $ do
         route stripOffCtfPrefix
         compile copyFileCompiler
 
