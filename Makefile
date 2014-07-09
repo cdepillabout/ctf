@@ -1,8 +1,10 @@
 
-.PHONY: build cabal-clean clean deploy super-clean watch
+.PHONY: build cabal-clean clean deploy ghci repl super-clean watch
 
 all: build
 
+
+# files we depend on 
 
 .cabal-sandbox/bin/site: site.hs
 	if [ ! -d ".cabal-sandbox" ] ; then cabal sandbox init ; fi
@@ -15,7 +17,7 @@ _site/.git: _site
 	cp -r .git _site/.git
 	bash -c '(cd _site/ && git checkout -f gh-pages && git reset --hard HEAD && git clean -f -x)'
 
-
+# Hakyll functions
 
 build: .cabal-sandbox/bin/site _site
 	.cabal-sandbox/bin/site build
@@ -28,6 +30,8 @@ watch: .cabal-sandbox/bin/site
 
 
 
+# Cleaning functions
+
 clean: 
 	rm -rf ./_cache
 	rm -rf ./_site/*
@@ -37,3 +41,11 @@ cabal-clean:
 	rm -rf .cabal-sandbox/bin/site
 
 super-clean: clean cabal-clean
+
+
+# Cabal functions
+
+repl:
+	cabal repl
+
+ghci: repl

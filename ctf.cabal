@@ -57,8 +57,9 @@ executable site
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base,
-                       hakyll
+  build-depends:       base
+                     , hakyll
+
   
   -- Directories containing source files.
   -- hs-source-dirs:      

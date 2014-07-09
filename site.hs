@@ -3,11 +3,15 @@
 import           Data.Monoid (mappend)
 import           Debug.Trace
 import           Hakyll
+import           Data.List (stripPrefix)
+import           Data.Maybe (fromJust)
 
 
 --------------------------------------------------------------------------------
 main :: IO ()
 main = hakyll $ do
+
+    {-
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
@@ -59,17 +63,28 @@ main = hakyll $ do
                 >>= loadAndApplyTemplate "templates/default.html" indexCtx
                 >>= relativizeUrls
 
+    -}
     match "templates/*" $ compile templateCompiler
 
-    match "_old/**" $ do
-        route idRoute
+    match "_old/**.md" $ do
+        route $ stripOffCtfPrefix `composeRoutes` setExtension "html"
         compile $ do
             ident <- getUnderlying
             traceShowM ident
-            copyFileCompiler
+            pandocCompiler
+                >>= loadAndApplyTemplate "templates/post.html"    postCtx
+                >>= loadAndApplyTemplate "templates/default.html" postCtx
+                >>= relativizeUrls
 
+    match "_old/**" $ do
+        route stripOffCtfPrefix
+        compile copyFileCompiler
 
 --------------------------------------------------------------------------------
+
+stripOffCtfPrefix :: Routes
+stripOffCtfPrefix = customRoute $ fromJust . stripPrefix "_old/" . toFilePath
+
 postCtx :: Context String
 postCtx =
     dateField "date" "%B %e, %Y" `mappend`
