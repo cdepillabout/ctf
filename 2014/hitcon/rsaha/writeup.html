@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>My Hakyll Blog - writeup</title>
+        <link rel="stylesheet" type="text/css" href="../../../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../../">My Hakyll Blog</a>
+            </div>
+            <div id="navigation">
+                <a href="../../../">Home</a>
+                <a href="../../../about.html">About</a>
+                <a href="../../../contact.html">Contact</a>
+                <a href="../../../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>writeup</h1>
+
+            <div class="info">
+    
+</div>
+
+<h1 id="crypto-rsaha-200">(crypto) rsaha [200]</h1>
+<h2 id="description">Description</h2>
+<p>Can you break RSA?</p>
+<p>https://dl.dropbox.com/s/xqkoamfvas1rdb7/rsaha-fe50cf1bcae41e8ec6eeebccf3f0de7c.py</p>
+<p>http://ctf.tw/rsaha-fe50cf1bcae41e8ec6eeebccf3f0de7c.py</p>
+<p>nc 54.64.40.172 5454</p>
+<h3 id="hint">Hint</h3>
+<p>(none)</p>
+<h2 id="solution">Solution</h2>
+<h3 id="writeups">WriteUps</h3>
+<ul>
+<li>https://github.com/ctfs/write-ups/tree/master/hitcon-ctf-2014/rsaha</li>
+</ul>
+<h3 id="my-notes">My Notes</h3>
+<ol style="list-style-type: decimal">
+<li></li>
+</ol>
+<h3 id="takeaways">Takeaways</h3>
+<ul>
+<li></li>
+</ul>
+<h3 id="rsa">RSA</h3>
+<p>RSA Involves 3 steps, key generation, encryption, and decryption.</p>
+<h4 id="key-generation">Key Generation</h4>
+<ol style="list-style-type: decimal">
+<li><p>Choose two prime numbers, <code>p</code> and <code>q</code>. They should be similar bit-length. Can be found efficiently using the primality test.</p></li>
+<li><p>Compute <code>n = pq</code>. <code>n</code> is used as the modulus.</p></li>
+<li><p>Compute <code>φ(n) = φ(p)φ(q) = (p − 1)(q − 1) = n - (p + q - 1)</code>. <code>φ</code> is Eulers totient function.</p></li>
+<li>Choose an integer <code>e</code> such that <code>1 &lt; e &lt; φ(n)</code> and <code>gcd(e, φ(n)) = 1</code>. That is to say, <code>e</code> and <code>φ(n)</code> are coprime.
+<ul>
+<li><code>e</code> is the public key exponent.</li>
+<li><code>e</code> having a short bit-length and small Hamming weight results in more efficient encryption – most commonly <code>216 + 1 = 65,537</code>. However, much smaller values of <code>e</code> (such as 3) have been shown to be less secure in some settings.</li>
+</ul></li>
+<li>Determine <code>d</code> as <code>d ≡ e^(-1) (mod φ(n))</code>; i.e., <code>d</code> is the multiplicative inverse of <code>e (modulo φ(n))</code>.</li>
+</ol>
+<ul>
+<li>This is more clearly stated as: solve for <code>d</code> given <code>d⋅e ≡ 1 (mod φ(n))</code></li>
+<li>This is often computed using the <a href="http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm">extended Euclidean algorithm</a>. Using the pseudocode in the Modular integers section, inputs <code>a</code> and <code>n</code> correspond to <code>e</code> and <code>φ(n)</code>, respectively.</li>
+<li><p><code>d</code> is kept as the private key exponent.</p></li>
+<li><p><em>public key</em> consists of modulus <code>n</code> and public exponent <code>e</code>.</p></li>
+<li><p><em>private key</em> consists of modulus <code>n</code> and private exponent <code>d</code>. <code>p</code>, <code>q</code>, and <code>φ(n)</code> must also be kept secret because they can be used to calculate <code>d</code>.</p></li>
+</ul>
+<h4 id="encryption">Encryption</h4>
+<ol style="list-style-type: decimal">
+<li><p>Alice transfers her public key <code>(n, e)</code> to Bob and keeps the private key <code>d</code> secret.</p></li>
+<li><p>Bob wants to send <code>m</code> to Alice (such that <code>0 ≤ m &lt; n</code>).</p></li>
+<li><p>Bob computes <code>c</code> as <code>c ≡ m^e (mod n)</code>. This can be done quickly using exponentiation by squaring.</p></li>
+</ol>
+<h4 id="decryption">Decryption</h4>
+<p>Alice can recover <code>m</code> from <code>c</code> by using her private key exponent <code>d</code> by computing <code>m ≡ c^d (mod n)</code>.</p>
+<p>(There are more efficient ways of calculating <code>c^d</code> by using the <a href="http://en.wikipedia.org/wiki/RSA_%28algorithm%29#Using_the_Chinese_remainder_algorithm">Chinese remainder algorithm</a>.)</p>
+<h4 id="extended-euclidean-algorithm"><a href="http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm">Extended Euclidean Algorithm</a></h4>
+<h4 id="exponentiation-by-squaring"><a href="http://en.wikipedia.org/wiki/Exponentiation_by_squaring">Exponentiation by Squaring</a></h4>
+<p>This allows us to efficiently calculate the encryption and decryption of a message like <code>c ≡ m^e (mod n)</code>.</p>
+<h4 id="chinese-remainder-algorithm-for-calculating-m-from-c"><a href="http://en.wikipedia.org/wiki/Chinese_remainder_theorem">Chinese Remainder Algorithm for Calculating <code>m</code> from <code>c</code></a></h4>
+<p>For efficiency, the following values are are precomputed and stored as part of the private key.</p>
+<ul>
+<li><code>p</code> and <code>q</code>: the primes from the key generation.</li>
+<li>d<sub>p</sub> = d (mod p - 1)</li>
+</ul>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
