@@ -18,8 +18,7 @@ indexFileName :: String
 indexFileName = "index.md"
 
 unlessM :: Monad m => m Bool -> m () -> m ()
---unlessM mbool monad = flip unless monad =<< mbool
-unlessM = join . liftM unless
+unlessM mbool monad = flip unless monad =<< mbool
 
 createIndexMdFiles :: IO ()
 createIndexMdFiles = getRecursiveDirs writeupsDir >>= mapM_ writeIndexMd
