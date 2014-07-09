@@ -14,8 +14,9 @@ _site:
 	mkdir -p _site
 
 _site/.git: _site
-	cp -r .git _site/.git
-	bash -c '(cd _site/ && git checkout -f gh-pages && git reset --hard HEAD && git clean -f -x)'
+	git fetch -p
+	cp -r .git _site/
+	bash -c '(cd _site/ && git checkout -f origin/gh-pages && git reset --hard HEAD && git clean -f -x)'
 
 # Hakyll functions
 
@@ -23,7 +24,7 @@ build: .cabal-sandbox/bin/site _site
 	.cabal-sandbox/bin/site build
 
 deploy: _site/.git build
-	bash -c '(cd _site/ && git add -A . && git commit -m "Deploy" && git push)'
+	bash -c '(cd _site/ && git add -A . && git commit -m "Deploy" && git push origin HEAD:gh-pages)'
 
 watch: .cabal-sandbox/bin/site
 	.cabal-sandbox/bin/site watch -h 0.0.0.0
