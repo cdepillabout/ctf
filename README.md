@@ -17,6 +17,10 @@ Building Site
 # build site
 $ make build
 
+# if the building doesn't work for some reason,
+# make sure to clean out all hakyll caches
+$ make clean
+
 # run webserver and change on reload
 $ make watch
 
