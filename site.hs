@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
+import Control.Exception (finally)
 import Control.Monad (filterM, forM, join, liftM, unless)
 import Data.Functor ((<$>))
 import Data.List (stripPrefix)
@@ -17,6 +18,9 @@ writeupsDir = "writeups"
 indexFileName :: String
 indexFileName = "index.md"
 
+outputDir :: String
+outputDir = "_site"
+
 unlessM :: Monad m => m Bool -> m () -> m ()
 unlessM mbool monad = flip unless monad =<< mbool
 
@@ -30,23 +34,31 @@ createIndexMdFiles = getRecursiveDirs writeupsDir >>= mapM_ writeIndexMd
 
 getRecursiveDirs :: FilePath -> IO [FilePath]
 getRecursiveDirs topDir = filterM doesDirectoryExist =<< getDirRecursiveContents topDir
+  where
+    getDirRecursiveContents :: FilePath -> IO [FilePath]
+    getDirRecursiveContents dir = do
+        names <- getDirectoryContents dir
+        let properNames = filter (`notElem` [".", ".."]) names
+        paths <- forM properNames $ \name -> do
+            let path = topDir </> name
+            isDirectory <- doesDirectoryExist path
+            if isDirectory
+                then (path :) <$> getDirRecursiveContents path
+                else return [path]
+        return (concat paths)
 
-getDirRecursiveContents :: FilePath -> IO [FilePath]
-getDirRecursiveContents topdir = do
-    names <- getDirectoryContents topdir
-    let properNames = filter (`notElem` [".", ".."]) names
-    paths <- forM properNames $ \name -> do
-        let path = topdir </> name
-        isDirectory <- doesDirectoryExist path
-        if isDirectory
-            then (path :) <$> getDirRecursiveContents path
-            else return [path]
-    return (concat paths)
+addDirectoryListToIndexHtml :: IO ()
+addDirectoryListToIndexHtml = do
+    getRecursiveDirs outputDir >>= print
+
 
 main :: IO ()
 main = do
         createIndexMdFiles
-        doHakyll
+        -- hakyll exits with the exitWith function (returning a meaningful
+        -- return code if it succeeds or fails) when running build, but we
+        -- want to do something after it, so we wrap it in a finally
+        finally doHakyll addDirectoryListToIndexHtml
 
 --------------------------------------------------------------------------------
 doHakyll :: IO ()
@@ -113,7 +125,7 @@ doHakyll = hakyll $ do
             --ident <- getUnderlying
             --traceShowM ident
             pandocCompiler
-                >>= loadAndApplyTemplate "templates/post.html"    postCtx
+                >>= loadAndApplyTemplate "templates/index.html"   postCtx
                 >>= loadAndApplyTemplate "templates/default.html" postCtx
                 >>= relativizeUrls
 

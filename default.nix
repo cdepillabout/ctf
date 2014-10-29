@@ -17,14 +17,21 @@ in
 
     enableSplitObjs = false;
 
-    buildDepends = with pkgs.haskellPackages; [
+    buildDepends = [
       haskellPackages.filepath 
       #haskellPackages.hakyll
-
-      zlib
+      
+      pkgs.openssl
+      pkgs.pcre
+      pkgs.zlib
     ];
 
-    buildTools = with pkgs.haskellPackages; [ cabalInstall ghcMod ];
+    buildTools = with pkgs.haskellPackages; [
+      #ghcMod
+      alex
+      cabalInstall
+      happy
+    ];
 
     #meta = {
     #  license = self.stdenv.lib.licenses.gpl2;
