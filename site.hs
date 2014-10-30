@@ -94,7 +94,8 @@ deleteIndexHtmlFiles = do
 main :: IO ()
 main = do
         createIndexMdFiles
-        deleteIndexHtmlFiles
+        --deleteIndexHtmlFiles
+
         -- hakyll exits with the exitWith function (returning a meaningful
         -- return code if it succeeds or fails) when running build, but we
         -- want to do something after it, so we wrap it in a finally
