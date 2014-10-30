@@ -63,6 +63,7 @@ executable site
                      , directory
                      , filepath
                      , stringsearch
+                     , unix
 
   
   -- Directories containing source files.

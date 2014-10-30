@@ -14,8 +14,9 @@ import Data.Maybe (fromJust)
 import Data.Monoid (mappend)
 import Debug.Trace
 import Hakyll
-import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents)
+import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents, removeFile)
 import System.FilePath ((</>), takeDirectory)
+import System.Posix.Files (setFileTimes)
 
 
 writeupsDir :: FilePath
@@ -56,23 +57,24 @@ getDirRecursiveContents dir = do
 removeDotDirs :: [FilePath] -> [FilePath]
 removeDotDirs = filter (`notElem` [".", ".."])
 
+isIndexHtml :: FilePath -> Bool
+isIndexHtml path = (path == "index.html" || "/index.html" `isSuffixOf` path)
+
 addDirectoryListToIndexHtml :: IO ()
 addDirectoryListToIndexHtml = do
     allFiles <- getDirRecursiveContents outputDir
     let indexHtmlList = filter isIndexHtml allFiles
     mapM_ addFileList indexHtmlList
   where
-    isIndexHtml :: FilePath -> Bool
-    isIndexHtml path = (path == "index.html" || "/index.html" `isSuffixOf` path)
-
     addFileList :: FilePath -> IO ()
     addFileList path = do
-        dirContents <- fmap (sort . removeDotDirs) $ getDirContentsOfFile path
+        dirContents <- sort . removeDotDirs <$> getDirContentsOfFile path
         let htmlFileList = LazyByteStringChar8.pack $ createHtmlFileList dirContents
         fileContents <- ByteString.readFile path
         let replacementByteString = ByteStringChar8.pack "REPLACE_THIS_WITH_FILE_LIST"
         let newFileContents = replace replacementByteString htmlFileList fileContents
         LazyByteString.writeFile path newFileContents
+        --setFileTimes path (fromIntegral 0) (fromIntegral 0)
 
     createHtmlFileList :: [FilePath] -> String
     createHtmlFileList paths = "<ul>" ++ lis ++ "</ul>"
@@ -83,11 +85,16 @@ addDirectoryListToIndexHtml = do
     getDirContentsOfFile "index.html" = getDirectoryContents outputDir
     getDirContentsOfFile file = getDirectoryContents $ takeDirectory file
 
-
+deleteIndexHtmlFiles :: IO ()
+deleteIndexHtmlFiles = do
+    allFiles <- getDirRecursiveContents outputDir
+    let indexHtmlList = filter isIndexHtml allFiles
+    mapM_ removeFile indexHtmlList
 
 main :: IO ()
 main = do
         createIndexMdFiles
+        deleteIndexHtmlFiles
         -- hakyll exits with the exitWith function (returning a meaningful
         -- return code if it succeeds or fails) when running build, but we
         -- want to do something after it, so we wrap it in a finally
