@@ -1,16 +1,21 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
 import Control.Exception (finally)
-import Control.Monad (filterM, forM, join, liftM, unless)
+import Control.Monad (filterM, forM, liftM, unless)
+import qualified Data.ByteString as ByteString
+import qualified Data.ByteString.Char8 as ByteStringChar8
+import qualified Data.ByteString.Lazy as LazyByteString
+import qualified Data.ByteString.Lazy.Char8 as LazyByteStringChar8
+import Data.ByteString.Search (replace)
+import Data.ByteString.Search.Substitution ()
 import Data.Functor ((<$>))
-import Data.List (isSuffixOf, stripPrefix)
-import Data.List.Utils (replace)
+import Data.List (isSuffixOf, sort, stripPrefix)
 import Data.Maybe (fromJust)
 import Data.Monoid (mappend)
-import Debug.Trace ()
+import Debug.Trace
 import Hakyll
 import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents)
-import System.FilePath ((</>))
+import System.FilePath ((</>), takeDirectory)
 
 
 writeupsDir :: FilePath
@@ -39,7 +44,7 @@ getRecursiveDirs topDir = filterM doesDirectoryExist =<< getDirRecursiveContents
 getDirRecursiveContents :: FilePath -> IO [FilePath]
 getDirRecursiveContents dir = do
     names <- getDirectoryContents dir
-    let properNames = filter (`notElem` [".", ".."]) names
+    let properNames = removeDotDirs names
     paths <- forM properNames $ \name -> do
         let path = dir </> name
         isDirectory <- doesDirectoryExist path
@@ -48,10 +53,13 @@ getDirRecursiveContents dir = do
             else return [path]
     return (concat paths)
 
+removeDotDirs :: [FilePath] -> [FilePath]
+removeDotDirs = filter (`notElem` [".", ".."])
+
 addDirectoryListToIndexHtml :: IO ()
 addDirectoryListToIndexHtml = do
     allFiles <- getDirRecursiveContents outputDir
-    indexHtmlList <- map (filter isIndexHtml) allFiles
+    let indexHtmlList = filter isIndexHtml allFiles
     mapM_ addFileList indexHtmlList
   where
     isIndexHtml :: FilePath -> Bool
@@ -59,11 +67,12 @@ addDirectoryListToIndexHtml = do
 
     addFileList :: FilePath -> IO ()
     addFileList path = do
-        dirContents <- getDirContentsOfFile path
-        let htmlFileList = createHtmlFileList dirContents
-        fileContents <- readFile path
-        let newFileContents = replace "REPLACE_THIS_WITH_FILE_LIST" htmlFileList fileContents
-        writeFile path newFileContents
+        dirContents <- fmap (sort . removeDotDirs) $ getDirContentsOfFile path
+        let htmlFileList = LazyByteStringChar8.pack $ createHtmlFileList dirContents
+        fileContents <- ByteString.readFile path
+        let replacementByteString = ByteStringChar8.pack "REPLACE_THIS_WITH_FILE_LIST"
+        let newFileContents = replace replacementByteString htmlFileList fileContents
+        LazyByteString.writeFile path newFileContents
 
     createHtmlFileList :: [FilePath] -> String
     createHtmlFileList paths = "<ul>" ++ lis ++ "</ul>"
@@ -72,11 +81,7 @@ addDirectoryListToIndexHtml = do
 
     getDirContentsOfFile :: FilePath -> IO [FilePath]
     getDirContentsOfFile "index.html" = getDirectoryContents outputDir
-    getDirContentsOfFile file = do
-        let splitPath = split "/" file
-            allButLast = init splitPath
-            allButLastPath = join "/" allButLast
-        getDirectoryContents allButLastPath
+    getDirContentsOfFile file = getDirectoryContents $ takeDirectory file
 
 
 

@@ -59,9 +59,10 @@ executable site
   -- Other library packages from which modules are imported.
   build-depends:       base
                      , hakyll == 4.5.3.0
+                     , bytestring
                      , directory
                      , filepath
-                     , MissingH == 1.2.1.0
+                     , stringsearch
 
   
   -- Directories containing source files.

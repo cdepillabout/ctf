@@ -26,11 +26,13 @@ in
       pkgs.zlib
     ];
 
-    buildTools = with pkgs.haskellPackages; [
+    buildTools = [
       #ghcMod
-      alex
-      cabalInstall
-      happy
+      pkgs.haskellPackages.alex
+      pkgs.haskellPackages.cabalInstall
+      pkgs.haskellPackages.happy
+
+      pkgs.zlib
     ];
 
     #meta = {
