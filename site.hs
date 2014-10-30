@@ -3,7 +3,8 @@
 import Control.Exception (finally)
 import Control.Monad (filterM, forM, join, liftM, unless)
 import Data.Functor ((<$>))
-import Data.List (stripPrefix)
+import Data.List (isSuffixOf, stripPrefix)
+import Data.List.Utils (replace)
 import Data.Maybe (fromJust)
 import Data.Monoid (mappend)
 import Debug.Trace ()
@@ -12,13 +13,13 @@ import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents
 import System.FilePath ((</>))
 
 
-writeupsDir :: String
+writeupsDir :: FilePath
 writeupsDir = "writeups"
 
-indexFileName :: String
+indexFileName :: FilePath
 indexFileName = "index.md"
 
-outputDir :: String
+outputDir :: FilePath
 outputDir = "_site"
 
 unlessM :: Monad m => m Bool -> m () -> m ()
@@ -34,22 +35,49 @@ createIndexMdFiles = getRecursiveDirs writeupsDir >>= mapM_ writeIndexMd
 
 getRecursiveDirs :: FilePath -> IO [FilePath]
 getRecursiveDirs topDir = filterM doesDirectoryExist =<< getDirRecursiveContents topDir
-  where
-    getDirRecursiveContents :: FilePath -> IO [FilePath]
-    getDirRecursiveContents dir = do
-        names <- getDirectoryContents dir
-        let properNames = filter (`notElem` [".", ".."]) names
-        paths <- forM properNames $ \name -> do
-            let path = topDir </> name
-            isDirectory <- doesDirectoryExist path
-            if isDirectory
-                then (path :) <$> getDirRecursiveContents path
-                else return [path]
-        return (concat paths)
+
+getDirRecursiveContents :: FilePath -> IO [FilePath]
+getDirRecursiveContents dir = do
+    names <- getDirectoryContents dir
+    let properNames = filter (`notElem` [".", ".."]) names
+    paths <- forM properNames $ \name -> do
+        let path = dir </> name
+        isDirectory <- doesDirectoryExist path
+        if isDirectory
+            then (path :) <$> getDirRecursiveContents path
+            else return [path]
+    return (concat paths)
 
 addDirectoryListToIndexHtml :: IO ()
 addDirectoryListToIndexHtml = do
-    getRecursiveDirs outputDir >>= print
+    allFiles <- getDirRecursiveContents outputDir
+    indexHtmlList <- map (filter isIndexHtml) allFiles
+    mapM_ addFileList indexHtmlList
+  where
+    isIndexHtml :: FilePath -> Bool
+    isIndexHtml path = (path == "index.html" || "/index.html" `isSuffixOf` path)
+
+    addFileList :: FilePath -> IO ()
+    addFileList path = do
+        dirContents <- getDirContentsOfFile path
+        let htmlFileList = createHtmlFileList dirContents
+        fileContents <- readFile path
+        let newFileContents = replace "REPLACE_THIS_WITH_FILE_LIST" htmlFileList fileContents
+        writeFile path newFileContents
+
+    createHtmlFileList :: [FilePath] -> String
+    createHtmlFileList paths = "<ul>" ++ lis ++ "</ul>"
+      where
+        lis = concatMap (\path -> "<li>" ++ path ++ "</li>") paths
+
+    getDirContentsOfFile :: FilePath -> IO [FilePath]
+    getDirContentsOfFile "index.html" = getDirectoryContents outputDir
+    getDirContentsOfFile file = do
+        let splitPath = split "/" file
+            allButLast = init splitPath
+            allButLastPath = join "/" allButLast
+        getDirectoryContents allButLastPath
+
 
 
 main :: IO ()
