@@ -68,18 +68,26 @@ addDirectoryListToIndexHtml = do
   where
     addFileList :: FilePath -> IO ()
     addFileList path = do
-        dirContents <- sort . removeDotDirs <$> getDirContentsOfFile path
+        dirContents <- sort . removeUnneededFiles <$> getDirContentsOfFile path
         let htmlFileList = LazyByteStringChar8.pack $ createHtmlFileList dirContents
         fileContents <- ByteString.readFile path
         let replacementByteString = ByteStringChar8.pack "REPLACE_THIS_WITH_FILE_LIST"
         let newFileContents = replace replacementByteString htmlFileList fileContents
         LazyByteString.writeFile path newFileContents
         --setFileTimes path (fromIntegral 0) (fromIntegral 0)
+      where
+        removeUnneededFiles :: [FilePath] -> [FilePath]
+        removeUnneededFiles = filter (`notElem` [".", "..", "index.html", "images", "css"])
+
 
     createHtmlFileList :: [FilePath] -> String
     createHtmlFileList paths = "<ul>" ++ lis ++ "</ul>"
       where
-        lis = concatMap (\path -> "<li>" ++ path ++ "</li>") paths
+        lis :: String
+        lis = concatMap (\path -> "<li>" ++ createLink path ++ "</li>") paths
+
+        createLink :: FilePath -> String
+        createLink path = "<a href=\"" ++ path ++ "\">" ++ path ++ "</a>"
 
     getDirContentsOfFile :: FilePath -> IO [FilePath]
     getDirContentsOfFile "index.html" = getDirectoryContents outputDir
@@ -106,13 +114,6 @@ doHakyll :: IO ()
 doHakyll = hakyll $ do
 
     {-
-    match "images/*" $ do
-        route   idRoute
-        compile copyFileCompiler
-
-    match "css/*" $ do
-        route   idRoute
-        compile compressCssCompiler
 
     match (fromList ["about.rst", "contact.markdown"]) $ do
         route   $ setExtension "html"
@@ -158,6 +159,15 @@ doHakyll = hakyll $ do
                 >>= relativizeUrls
 
     -}
+
+    match "images/*" $ do
+        route   idRoute
+        compile copyFileCompiler
+
+    match "css/*" $ do
+        route   idRoute
+        compile compressCssCompiler
+
     match "templates/*" $ compile templateCompiler
 
     match (fromGlob $ writeupsDir ++ "/**index.md") $ do
@@ -169,6 +179,12 @@ doHakyll = hakyll $ do
                 >>= loadAndApplyTemplate "templates/index.html"   postCtx
                 >>= loadAndApplyTemplate "templates/default.html" postCtx
                 >>= relativizeUrls
+
+    match (fromGlob $ writeupsDir ++ "/**.md") $ do
+        route $ stripOffCtfPrefix `composeRoutes` setExtension "html"
+        compile $ pandocCompiler
+            >>= loadAndApplyTemplate "templates/default.html" postCtx
+            >>= relativizeUrls
 
     match (fromGlob $ writeupsDir ++ "/**") $ do
         route stripOffCtfPrefix
