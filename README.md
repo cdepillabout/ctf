@@ -13,13 +13,16 @@ The [html generated from this repo](https://cdepillabout.github.io/ctf/) is up o
 Building Site
 =============
 
-```
+```bash
 # build site
 $ make build
 
 # if the building doesn't work for some reason,
 # make sure to clean out all hakyll caches
 $ make clean
+
+# do both a clean and a build
+$ make rebuild
 
 # run webserver and change on reload
 $ make watch
