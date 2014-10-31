@@ -13,7 +13,7 @@ The [html generated from this repo](https://cdepillabout.github.io/ctf/) is up o
 Building Site
 =============
 
-```bash
+```sh
 # build site
 $ make build
 
