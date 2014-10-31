@@ -29,7 +29,8 @@ deploy: _site/.git build
 watch: .cabal-sandbox/bin/site
 	.cabal-sandbox/bin/site watch -h 0.0.0.0
 
-
+rebuild: .cabal-sandbox/bin/site _site
+	.cabal-sandbox/bin/site rebuild
 
 # Cleaning functions
 
