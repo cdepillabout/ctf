@@ -12,11 +12,12 @@ import Data.Functor ((<$>))
 import Data.List (isSuffixOf, sort, stripPrefix)
 import Data.Maybe (fromJust)
 import Data.Monoid (mappend)
+import qualified Data.Set as Set
 import Debug.Trace
 import Hakyll
 import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents, removeFile)
 import System.FilePath ((</>), takeDirectory)
-import System.Posix.Files (setFileTimes)
+import Text.Pandoc.Options (Extension(Ext_latex_macros, Ext_tex_math_double_backslash, Ext_tex_math_dollars), HTMLMathMethod(MathJax), writerExtensions, WriterOptions(writerHTMLMathMethod))
 
 
 writeupsDir :: FilePath
@@ -74,7 +75,6 @@ addDirectoryListToIndexHtml = do
         let replacementByteString = ByteStringChar8.pack "REPLACE_THIS_WITH_FILE_LIST"
         let newFileContents = replace replacementByteString htmlFileList fileContents
         LazyByteString.writeFile path newFileContents
-        --setFileTimes path (fromIntegral 0) (fromIntegral 0)
       where
         removeUnneededFiles :: [FilePath] -> [FilePath]
         removeUnneededFiles = filter (`notElem` [".", "..", "index.html", "images", "css"])
@@ -175,14 +175,14 @@ doHakyll = hakyll $ do
         compile $ do
             --ident <- getUnderlying
             --traceShowM ident
-            pandocCompiler
+            pandocMathCompiler
                 >>= loadAndApplyTemplate "templates/index.html"   postCtx
                 >>= loadAndApplyTemplate "templates/default.html" postCtx
                 >>= relativizeUrls
 
     match (fromGlob $ writeupsDir ++ "/**.md") $ do
         route $ stripOffCtfPrefix `composeRoutes` setExtension "html"
-        compile $ pandocCompiler
+        compile $ pandocMathCompiler
             >>= loadAndApplyTemplate "templates/default.html" postCtx
             >>= relativizeUrls
 
@@ -191,6 +191,19 @@ doHakyll = hakyll $ do
         compile copyFileCompiler
 
 --------------------------------------------------------------------------------
+
+
+pandocMathCompiler :: Compiler (Item String)
+pandocMathCompiler =
+    let mathExtensions = [Ext_tex_math_dollars, Ext_tex_math_double_backslash,
+                          Ext_latex_macros]
+        defaultExtensions = writerExtensions defaultHakyllWriterOptions
+        newExtensions = foldr Set.insert defaultExtensions mathExtensions
+        writerOptions = defaultHakyllWriterOptions {
+                          writerExtensions = newExtensions,
+                          writerHTMLMathMethod = MathJax ""
+                        }
+    in pandocCompilerWith defaultHakyllReaderOptions writerOptions
 
 stripOffCtfPrefix :: Routes
 stripOffCtfPrefix = customRoute $ fromJust . stripPrefix (writeupsDir ++ "/") . toFilePath

@@ -36,13 +36,13 @@ RSA Involves 3 steps, key generation, encryption, and decryption.
 
 #### Key Generation
 
-1. Choose two prime numbers, `p` and `q`.  They should be similar bit-length.
+1. Choose two prime numbers, \\(p\\) and \\(q\\).  They should be similar bit-length.
    Can be found efficiently using the primality test.
 
-1. Compute `n = pq`.  `n` is used as the modulus.
+1. Compute \\(n = pq\\).  \\(n\\) is used as the modulus.
 
-1. Compute `φ(n) = φ(p)φ(q) = (p − 1)(q − 1) = n - (p + q - 1)`.  `φ` is Eulers
-   totient function.
+1. Compute \\(\\varphi(n) = \\varphi(p)\\varphi(q) = (p − 1)(q − 1) = n - (p + q - 1)\\).
+   \\(\\varphi\\) is Eulers totient function.
 
 1. Choose an integer `e` such that `1 < e < φ(n)` and `gcd(e, φ(n)) = 1`.  That
    is to say, `e` and `φ(n)` are coprime.

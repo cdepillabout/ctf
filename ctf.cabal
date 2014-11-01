@@ -60,11 +60,11 @@ executable site
   build-depends:       base
                      , hakyll == 4.5.3.0
                      , bytestring
+                     , containers
                      , directory
                      , filepath
+                     , pandoc
                      , stringsearch
-                     , unix
-
   
   -- Directories containing source files.
   -- hs-source-dirs:      
