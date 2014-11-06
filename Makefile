@@ -4,7 +4,10 @@
 all: build
 
 
-# files we depend on 
+
+########################
+## files we depend on ##
+########################
 
 .cabal-sandbox/bin/site: site.hs
 	if [ ! -d ".cabal-sandbox" ] ; then cabal sandbox init ; fi
@@ -19,7 +22,11 @@ _site/.git: _site
 	cp -r .git _site/
 	bash -c '(cd _site/ && git checkout -f origin/gh-pages && git reset --hard HEAD && git clean -f -x)'
 
-# Hakyll functions
+
+
+######################
+## Hakyll functions ##
+######################
 
 build: .cabal-sandbox/bin/site _site
 	.cabal-sandbox/bin/site build
@@ -33,7 +40,11 @@ watch: .cabal-sandbox/bin/site
 rebuild: .cabal-sandbox/bin/site _site
 	.cabal-sandbox/bin/site rebuild
 
-# Cleaning functions
+
+
+########################
+## Cleaning functions ##
+########################
 
 clean-cache: 
 	rm -rf ./_cache
@@ -48,7 +59,10 @@ cabal-clean:
 super-clean: clean cabal-clean
 
 
-# Cabal functions
+
+#####################
+## Cabal functions ##
+#####################
 
 repl:
 	cabal repl
