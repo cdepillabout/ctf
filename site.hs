@@ -77,7 +77,8 @@ addDirectoryListToIndexHtml = do
         LazyByteString.writeFile path newFileContents
       where
         removeUnneededFiles :: [FilePath] -> [FilePath]
-        removeUnneededFiles = filter (`notElem` [".", "..", "index.html", "images", "css"])
+        removeUnneededFiles =
+            filter (`notElem` [".", "..", ".git", "index.html", "images", "css"])
 
 
     createHtmlFileList :: [FilePath] -> String
