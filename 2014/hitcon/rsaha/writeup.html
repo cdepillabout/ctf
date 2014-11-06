@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>CTF Writeups - (crypto) rsaha [200]</title>
+        <!-- <link rel="stylesheet" type="text/css" href="/css/default.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../../css/spring.css" />
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+      <div id="layout">
+        <div id="header">
+          <h1 id="logo"><a href="../../../"><span>CTF</span> WriteUps</a></h1>
+
+          <div id="navigation">
+            <ul>
+              <li id="first"><a href="../../../">Home</a></li>
+              <li><a href="../">Up</a></li>
+              <li><a href="index.html">Contents of Current Dir</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="main">
+          <div id="main-box"><h1 id="quote">(crypto) rsaha [200]</h1></div>
+
+          <div id="content">
+            <h2 id="description">Description</h2>
+<p>Can you break RSA?</p>
+<p><a href="rsaha-fe50cf1bcae41e8ec6eeebccf3f0de7c.py">rsaha-fe50cf1bcae41e8ec6eeebccf3f0de7c.py</a></p>
+<p>nc 54.64.40.172 5454</p>
+<h3 id="hint">Hint</h3>
+<p>(none)</p>
+<h2 id="solution">Solution</h2>
+<h3 id="writeups">WriteUps</h3>
+<ul>
+<li><a href="https://github.com/ctfs/write-ups/tree/master/hitcon-ctf-2014/rsaha">ctfs rsaha writeup</a></li>
+</ul>
+<h3 id="my-notes">My Notes</h3>
+<p><strong>TODO</strong></p>
+<p>1.</p>
+<h3 id="takeaways">Takeaways</h3>
+<p><strong>TODO</strong></p>
+<ul>
+<li></li>
+</ul>
+<h3 id="rsa">RSA</h3>
+<p>RSA Involves 3 steps, key generation, encryption, and decryption.</p>
+<h4 id="key-generation">Key Generation</h4>
+<ol style="list-style-type: decimal">
+<li><p>Choose two prime numbers, \(p\) and \(q\). They should be similar bit-length. Can be found efficiently using the primality test.</p></li>
+<li><p>Compute \(n = pq\). \(n\) is used as the modulus.</p></li>
+<li><p>Compute \(\varphi(n) = \varphi(p)\varphi(q) = (p − 1)(q − 1) = n - (p + q - 1)\). \(\varphi\) is Eulers totient function.</p></li>
+<li>Choose an integer \(e\) such that \(1 &lt; e &lt; \varphi(n)\) and \(gcd(e, \varphi(n)) = 1\). That is to say, \(e\) and \(\varphi(n)\) are coprime.
+<ul>
+<li>\(e\) is the public key exponent.</li>
+<li>\(e\) having a short bit-length and small Hamming weight results in more efficient encryption – most commonly \(216 + 1 = 65,537\). However, much smaller values of \(e\) (such as 3) have been shown to be less secure in some settings.</li>
+</ul></li>
+<li>Determine \(d\) as \(d \equiv e^{-1} \pmod{\varphi(n)}\); i.e., \(d\) is the multiplicative inverse of \(e \pmod{\varphi(n)}\).</li>
+</ol>
+<ul>
+<li>This is more clearly stated as: solve for \(d\) given \(d \cdot e \equiv 1 \pmod{\varphi(n)}\)</li>
+<li>This is often computed using the <a href="http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm">extended Euclidean algorithm</a>. Using the pseudocode in the Modular integers section, inputs \(a\) and \(n\) correspond to \(e\) and \(\varphi(n)\), respectively.</li>
+<li><p>\(d\) is kept as the private key exponent.</p></li>
+<li><p><em>public key</em> consists of modulus \(n\) and public exponent \(e\).</p></li>
+<li><p><em>private key</em> consists of modulus \(n\) and private exponent \(d\). \(p\), \(q\), and \(\varphi(n)\) must also be kept secret because they can be used to calculate \(d\).</p></li>
+</ul>
+<p><strong>TODO</strong></p>
+<h4 id="encryption">Encryption</h4>
+<ol style="list-style-type: decimal">
+<li><p>Alice transfers her public key \((n, e)\) to Bob and keeps the private key \(d\) secret.</p></li>
+<li><p>Bob wants to send \(m\) to Alice (such that \(0 ≤ m &lt; n\)).</p></li>
+<li><p>Bob computes \(c\) as \(c \equiv m^e \pmod{n}\). This can be done quickly using exponentiation by squaring.</p></li>
+</ol>
+<p><strong>TODO</strong></p>
+<h4 id="decryption">Decryption</h4>
+<p>Alice can recover \(m\) from \(c\) by using her private key exponent \(d\) by computing \(m \equiv c^d \pmod{n}\).</p>
+<p>(There are more efficient ways of calculating \(c^d\) by using the <a href="http://en.wikipedia.org/wiki/RSA_%28algorithm%29#Using_the_Chinese_remainder_algorithm">Chinese remainder algorithm</a>.)</p>
+<p><strong>TODO</strong></p>
+<h4 id="extended-euclidean-algorithm"><a href="http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm">Extended Euclidean Algorithm</a></h4>
+<p><strong>TODO</strong></p>
+<h4 id="exponentiation-by-squaring"><a href="http://en.wikipedia.org/wiki/Exponentiation_by_squaring">Exponentiation by Squaring</a></h4>
+<p>This allows us to efficiently calculate the encryption and decryption of a message like \(c \equiv m^e \pmod{n}\).</p>
+<p><strong>TODO</strong></p>
+<h4 id="chinese-remainder-algorithm-for-calculating-m-from-c"><a href="http://en.wikipedia.org/wiki/Chinese_remainder_theorem">Chinese Remainder Algorithm for Calculating <code>m</code> from <code>c</code></a></h4>
+<p>For efficiency, the following values are are precomputed and stored as part of the private key.</p>
+<ul>
+<li>\(p\) and \(q\): the primes from the key generation.</li>
+<li>\(d_p = d \pmod{p - 1}\)</li>
+</ul>
+<p><strong>TODO</strong></p>
+          </div>
+          <div id="footer">
+              Site proudly generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+          </div>
+        </div>
+      </div>
+    </body>
+</html>
