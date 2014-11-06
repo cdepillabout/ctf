@@ -24,7 +24,7 @@ _site/.git: _site
 build: .cabal-sandbox/bin/site _site
 	.cabal-sandbox/bin/site build
 
-deploy: _site/.git clean-cache build
+deploy: _site/.git clean build
 	bash -c '(cd _site/ && git add -A . && git commit -m "Deploy" && git push origin HEAD:gh-pages)'
 
 watch: .cabal-sandbox/bin/site
